@@ -1,5 +1,5 @@
-using Abstraction.Map;
-using Abstraction.Room;
+using Abstractions.Map;
+using Abstractions.Room;
 using Map;
 using Room;
 using UnityEngine;
