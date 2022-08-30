@@ -17,6 +17,30 @@ namespace Abstraction.Room
         public int Height { get; }
     }
 
+    internal enum WallType
+    { 
+        None,
+        Full,
+        UpWall,
+        DownWall,
+        LeftWall,
+        RightWall,
+        UpLeftOutCorner,
+        UpRightOutCorner,
+        DownLeftOutCorner,
+        DownRightOutCorner,
+        UpLeftInCorner,
+        UpRightInCorner,
+        DownLeftInCorner,
+        DownRightInCorner
+    }
+
+    internal enum FloorType
+    {
+        None,
+        Full
+    }
+
     internal interface IRoomModel
     {
         public int Id { get; }
@@ -30,15 +54,24 @@ namespace Abstraction.Room
         public int RightDoorPosition { get; }
         public int Width { get; }
         public int Height { get; }
+        public WallType[,] WallMap { get; }
+        public FloorType[,] FloorMap { get; }
         public void CreateDoorWayUp(int doorPosition);
         public void CreateDoorWayDown(int doorPosition);
         public void CreateDoorWayLeft(int doorPosition);
         public void CreateDoorWayRight(int doorPosition);
+        public bool IsDoorUp(int position);
+        public bool IsDoorDown(int position);
+        public bool IsDoorLeft(int position);
+        public bool IsDoorRight(int position);
+        public bool IsWall(Vector2Int position);
     }
 
     internal interface IRoomModelFactory
     {
         public IRoomModel GetNew(int id, IRoomModelSettings roomModelSettings);
+        public void GenerateWalls(IRoomModel roomModel);
+        public void GenerateFloor(IRoomModel roomModel);
     }
 }
 
@@ -99,6 +132,8 @@ namespace Room
         public int _rightDoorPosition;
         public int _width;
         public int _height;
+        public WallType[,] _wallMap;
+        public FloorType[,] _floorMap;
 
         public int Id => _id;
 
@@ -119,6 +154,8 @@ namespace Room
         public int RightDoorPosition => _rightDoorPosition;
         public int Width => _width;
         public int Height => _height;
+        public WallType[,] WallMap => _wallMap;
+        public FloorType[,] FloorMap => _floorMap;
 
         public RoomModel(int id, IRoomModelSettings roomModelSettings)
         {
@@ -158,6 +195,28 @@ namespace Room
             _isWayRight = true;
             _rightDoorPosition = doorPosition;
         }
+
+        public bool IsDoorUp(int position)
+        {
+            return (IsWayUp && UpDoorPosition == position);
+        }
+        public bool IsDoorDown(int position)
+        {
+            return (IsWayDown && DownDoorPosition == position);
+        }
+        public bool IsDoorLeft(int position)
+        {
+            return (IsWayLeft && LeftDoorPosition == position);
+        }
+        public bool IsDoorRight(int position)
+        {
+            return (IsWayRight && RightDoorPosition == position);
+        }
+        public bool IsWall(Vector2Int position)
+        {
+            if (position.x < 0 || position.x > _width - 1 || position.x < 0 || position.y > _height - 1) return true;
+            return WallMap[position.x, position.y] != WallType.None;
+        }
     }
 
     internal sealed class RoomModelFactory : IRoomModelFactory
@@ -166,6 +225,99 @@ namespace Room
         {
             RoomModel roomModel = new RoomModel(id, roomModelSettings);
             return roomModel;
+        }
+
+        public void GenerateWalls(IRoomModel roomModel)
+        {
+            for (int x = 0; x < roomModel.Width; x++)
+            {
+                if (roomModel.IsDoorDown(x))
+                {
+                    roomModel.WallMap[x, 0] = WallType.None;
+                }
+                else
+                {
+                    roomModel.WallMap[x, 0] = WallType.Full;
+                }
+
+                if (roomModel.IsDoorUp(x))
+                {
+                    roomModel.WallMap[x, roomModel.Height - 1] = WallType.None;
+                }
+                else
+                {
+                    roomModel.WallMap[x, roomModel.Height - 1] = WallType.Full;
+                }
+            }
+            for (int y = 0; y < roomModel.Height; y++)
+            {
+                if (roomModel.IsDoorLeft(y))
+                {
+                    roomModel.WallMap[0, y] = WallType.None;
+                }
+                else
+                {
+                    roomModel.WallMap[0, y] = WallType.Full;
+                }
+
+                if (roomModel.IsDoorRight(y))
+                {
+                    roomModel.WallMap[roomModel.Width - 1, y] = WallType.None;
+                }
+                else
+                {
+                    roomModel.WallMap[roomModel.Width - 1, y] = WallType.Full;
+                }
+            }
+            for (int x = 0; x < roomModel.Width; x++)
+            {
+                for (int y = 0; y < roomModel.Height; y++)
+                {
+                    if (!roomModel.IsWall(new Vector2Int(x, y))) continue;
+                    bool upWall = roomModel.IsWall(new Vector2Int(x, y + 1));
+                    bool downWall = roomModel.IsWall(new Vector2Int(x, y - 1));
+                    bool leftWall = roomModel.IsWall(new Vector2Int(x - 1, y));
+                    bool rightWall = roomModel.IsWall(new Vector2Int(x + 1, y));
+                    if (upWall && downWall && leftWall && rightWall) roomModel.WallMap[x, y] = WallType.Full;
+                    if (upWall && downWall && leftWall && !rightWall) roomModel.WallMap[x, y] = WallType.RightWall;
+                    if (upWall && downWall && !leftWall && rightWall) roomModel.WallMap[x, y] = WallType.LeftWall;
+                    if (upWall && downWall && !leftWall && !rightWall) roomModel.WallMap[x, y] = WallType.Full;
+                    if (upWall && !downWall && leftWall && rightWall) roomModel.WallMap[x, y] = WallType.DownWall;
+                    if (upWall && !downWall && leftWall && !rightWall) roomModel.WallMap[x, y] = WallType.UpLeftInCorner;
+                    if (upWall && !downWall && !leftWall && rightWall) roomModel.WallMap[x, y] = WallType.UpRightInCorner;
+                    if (upWall && !downWall && !leftWall && !rightWall) roomModel.WallMap[x, y] = WallType.Full;
+                    if (!upWall && downWall && leftWall && rightWall) roomModel.WallMap[x, y] = WallType.DownWall;
+                    if (!upWall && downWall && leftWall && !rightWall) roomModel.WallMap[x, y] = WallType.DownLeftInCorner;
+                    if (!upWall && downWall && !leftWall && rightWall) roomModel.WallMap[x, y] = WallType.DownRightInCorner;
+                    if (!upWall && downWall && !leftWall && !rightWall) roomModel.WallMap[x, y] = WallType.Full;
+                    if (!upWall && !downWall && leftWall && rightWall) roomModel.WallMap[x, y] = WallType.Full;
+                    if (!upWall && !downWall && leftWall && !rightWall) roomModel.WallMap[x, y] = WallType.Full;
+                    if (!upWall && !downWall && !leftWall && rightWall) roomModel.WallMap[x, y] = WallType.Full;
+                    if (!upWall && !downWall && !leftWall && !rightWall) roomModel.WallMap[x, y] = WallType.Full;
+                }
+            }
+            if (roomModel.WallMap[0, 0] == WallType.Full) roomModel.WallMap[0, 0] = WallType.DownLeftOutCorner;
+            if (roomModel.WallMap[roomModel.Width - 1, 0] == WallType.Full) roomModel.WallMap[0, 0] = WallType.DownRightOutCorner;
+            if (roomModel.WallMap[0, roomModel.Height - 1] == WallType.Full) roomModel.WallMap[0, 0] = WallType.UpLeftOutCorner;
+            if (roomModel.WallMap[roomModel.Width - 1, roomModel.Height - 1] == WallType.Full) roomModel.WallMap[0, 0] = WallType.UpRightOutCorner;
+        }
+
+        public void GenerateFloor(IRoomModel roomModel)
+        {
+            for (int x = 0; x < roomModel.Width; x++)
+            {
+                for (int y = 0; y < roomModel.Height; y++)
+                {
+                    if (roomModel.IsWall(new Vector2Int(x, y)))
+                    {
+                        roomModel.FloorMap[x, y] = FloorType.None;
+                    }
+                    else
+                    {
+                        roomModel.FloorMap[x, y] = FloorType.Full;
+                    }
+                }
+            }
         }
     }
 }
@@ -321,6 +473,16 @@ namespace Map
                 ConnectRoom(mapModel, connectPoints, nextPosition);
             }
 
+            for (int x = 0; x < mapModel.Width - 1; x++)
+            {
+                for (int y = 0; y < mapModel.Height - 1; y++)
+                {
+                    IRoomModel currentRoomModel = mapModel.RoomModels[x, y];
+                    if (currentRoomModel == null) continue;
+                    roomModelFactory.GenerateWalls(currentRoomModel);
+                    roomModelFactory.GenerateFloor(currentRoomModel);
+                }
+            }
 
             return mapModel;
         }
