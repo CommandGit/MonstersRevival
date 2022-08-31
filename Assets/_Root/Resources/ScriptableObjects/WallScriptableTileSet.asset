@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 043cecc901181cc429e4d7583efd9e98, type: 3}
+  m_Name: WallScriptableTileSet
+  m_EditorClassIdentifier: 
+  _full: {fileID: 11400000, guid: 2202b330c93e387499ce6957587d2cfa, type: 2}
+  _upWall: {fileID: 11400000, guid: 2202b330c93e387499ce6957587d2cfa, type: 2}
+  _downWall: {fileID: 11400000, guid: 2202b330c93e387499ce6957587d2cfa, type: 2}
+  _leftWall: {fileID: 11400000, guid: 2202b330c93e387499ce6957587d2cfa, type: 2}
+  _rightWall: {fileID: 11400000, guid: 2202b330c93e387499ce6957587d2cfa, type: 2}
+  _upLeftOutCorner: {fileID: 11400000, guid: 2202b330c93e387499ce6957587d2cfa, type: 2}
+  _upRightOutCorner: {fileID: 11400000, guid: 2202b330c93e387499ce6957587d2cfa, type: 2}
+  _downLeftOutCorner: {fileID: 11400000, guid: 2202b330c93e387499ce6957587d2cfa, type: 2}
+  _downRightOutCorner: {fileID: 11400000, guid: 2202b330c93e387499ce6957587d2cfa, type: 2}
+  _upLeftInCorner: {fileID: 11400000, guid: 2202b330c93e387499ce6957587d2cfa, type: 2}
+  _upRightInCorner: {fileID: 11400000, guid: 2202b330c93e387499ce6957587d2cfa, type: 2}
+  _downLeftInCorner: {fileID: 11400000, guid: 2202b330c93e387499ce6957587d2cfa, type: 2}
+  _downRightInCorner: {fileID: 11400000, guid: 2202b330c93e387499ce6957587d2cfa, type: 2}
