@@ -9,6 +9,7 @@ namespace Starter
         void Start()
         {
             _game = new Game();
+            _game.Start();
         }
 
         void Update()

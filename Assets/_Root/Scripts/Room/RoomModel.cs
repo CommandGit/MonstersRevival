@@ -54,6 +54,8 @@ namespace Room
             _rightDoorPosition = 0;
             _width = roomModelSettings.Width;
             _height = roomModelSettings.Height;
+            _wallMap = new WallType[_width, _height];
+            _floorMap = new FloorType[_width, _height];
         }
 
         public void CreateDoorWayUp(int doorPosition)
@@ -98,8 +100,8 @@ namespace Room
         }
         public bool IsWall(Vector2Int position)
         {
-            if (position.x < 0 || position.x > _width - 1 || position.x < 0 || position.y > _height - 1) return true;
-            return WallMap[position.x, position.y] != WallType.None;
+            if (position.x < 0 || position.x > _width - 1 || position.y < 0 || position.y > _height - 1) return true;
+            return _wallMap[position.x, position.y] != WallType.None;
         }
     }
 }

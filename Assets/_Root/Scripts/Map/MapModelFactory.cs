@@ -14,7 +14,11 @@ namespace Map
             IRoomModel roomModel = mapModel.GetRoomModel(position);
             if (roomModel == null)
             {
-                nextPoints.Add(new Vector2Int(position.x, position.y));
+                Vector2Int newpoint = new Vector2Int(position.x, position.y);
+                if (!nextPoints.Contains(newpoint))
+                {
+                    nextPoints.Add(new Vector2Int(position.x, position.y));
+                }
             }
         }
         private void AddRoomNextPoint(List<Vector2Int> nextPoints, IMapModel mapModel, Vector2Int position)
@@ -22,7 +26,11 @@ namespace Map
             IRoomModel roomModel = mapModel.GetRoomModel(position);
             if (roomModel != null)
             {
-                nextPoints.Add(new Vector2Int(position.x, position.y));
+                Vector2Int newpoint = new Vector2Int(position.x, position.y);
+                if (!nextPoints.Contains(newpoint))
+                {
+                    nextPoints.Add(new Vector2Int(position.x, position.y));
+                }
             }
         }
 

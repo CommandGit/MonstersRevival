@@ -1,6 +1,6 @@
 ﻿using Abstractions.Room;
 
-namespace Room
+namespace Abstraction.Room
 {
     internal interface IRoomTileSetCreator
     {

@@ -1,6 +1,6 @@
 ﻿using UnityEngine.Tilemaps;
 
-namespace Room
+namespace Abstraction.Room
 {
     internal interface IFloorScriptableTileSet
     {

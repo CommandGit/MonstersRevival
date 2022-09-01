@@ -10,8 +10,8 @@ namespace Map
         [SerializeField] private Tilemap _floorTileMap;
         [SerializeField] private Tilemap _doorsTileMap;
 
-        public Tilemap WallsTileMap { get; }
-        public Tilemap FloorTileMap { get; }
-        public Tilemap DoorsTileMap { get; }
+        public Tilemap WallsTileMap => _wallsTileMap;
+        public Tilemap FloorTileMap => _floorTileMap;
+        public Tilemap DoorsTileMap => _doorsTileMap;
     }
 }
